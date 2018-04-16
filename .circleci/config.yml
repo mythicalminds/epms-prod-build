@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: circleci/openjdk:8-jdk
+    working_directory: ~/repo
+    environment:
+      MAVEN_OPTS: -Xmx3200m
+    steps:
+    - run:
+        name: Uploading jar to CF production
+        command: curl -v -L -o cf-cli_amd64.deb 'https://cli.run.pivotal.io/stable?release=debian64&source=github'; sudo dpkg -i cf-cli_amd64.deb; cf -v; cf api https://api.run.pivotal.io; cf auth girija.behera@siemens.com S!emens123^; cf target -o Siemens-EPMS -s production; cf a; cf push epms-ui -p /tmp/artifacts/epms-ui-0.0.1-SNAPSHOT.jar;
+    - save_cache:
+        paths:
+        - ~/.m2
+        key: v1-dependencies-{{ checksum "pom.xml" }}
